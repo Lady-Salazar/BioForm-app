@@ -2,5 +2,8 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 firebase-admin>=6.5
 python-dotenv>=1.0
+# Genkit esta en versiones 0.x: se fija la version exacta porque su API puede cambiar
+genkit==0.13.0
+genkit-google-genai==0.13.0
 pytest>=8.0
 httpx>=0.27

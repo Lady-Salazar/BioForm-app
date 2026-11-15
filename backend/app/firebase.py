@@ -3,7 +3,7 @@ import firebase_admin
 from firebase_admin import auth, credentials, firestore
 
 from app.config import FIREBASE_CREDENTIALS
-from app.schemas import BioData, RuleResult
+from app.schemas import AdviceContent, BioData, RuleResult
 
 _app = None
 
@@ -24,7 +24,13 @@ def verify_token(id_token: str) -> str:
     return decoded["uid"]
 
 
-def save_result(uid: str, data: BioData, rule: RuleResult, advice: str | None) -> None:
+def save_result(
+    uid: str,
+    data: BioData,
+    rule: RuleResult,
+    advice_status: str,
+    advice: AdviceContent | None,
+) -> None:
     """Guarda la metrica diaria y el consejo/alerta en Firestore.
 
     users/{uid}/metrics/{fecha}  -> resumen diario
@@ -45,7 +51,8 @@ def save_result(uid: str, data: BioData, rule: RuleResult, advice: str | None) -
             "alert_level": rule.level.value,
             "condition": rule.condition,
             "message": rule.message,
-            "advice": advice,
+            "advice_status": advice_status,
+            "advice": advice.model_dump(mode="json") if advice else None,
             "created_at": firestore.SERVER_TIMESTAMP,
         }
     )
