@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    // Firebase: lee la configuracion de google-services.json
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -37,6 +39,11 @@ android {
 }
 
 dependencies {
+    // Firebase: el BoM fija versiones compatibles entre todas las librerias de Firebase
+    implementation(platform("com.google.firebase:firebase-bom:35.2.0"))
+    implementation("com.google.firebase:firebase-auth")       // Login
+    implementation("com.google.firebase:firebase-firestore")  // Base de datos
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

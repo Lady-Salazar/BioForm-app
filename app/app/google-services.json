@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "689473588487",
+    "project_id": "bioform-ai",
+    "storage_bucket": "bioform-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689473588487:android:d407c66de274da8a8449a2",
+        "android_client_info": {
+          "package_name": "com.bioform.ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "689473588487-i894u6in1r1eu50dn5cvgd0lri2h3k11.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bioform.ai",
+            "certificate_hash": "af4215ddd415219456dd630d7789a4f2a35cf4d6"
+          }
+        },
+        {
+          "client_id": "689473588487-hrmhg5no4r7giev47qqjtpvfemfj7dc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_SOtxx347diBLFDqBCp1xFi6YI0qdjxI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "689473588487-hrmhg5no4r7giev47qqjtpvfemfj7dc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
