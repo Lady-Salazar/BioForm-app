@@ -1,0 +1,16 @@
+# Claves y secretos (NUNCA subir)
+.env
+*serviceAccount*.json
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# Flutter
+app/build/
+app/.dart_tool/
+
+# Sistema
+.DS_Store
+Thumbs.db
