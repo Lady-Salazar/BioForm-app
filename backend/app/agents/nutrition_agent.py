@@ -1,4 +1,5 @@
 """Agente Nutricional: herramienta de calculo + Gemini para redactar."""
+from app.agents.llm import generate_structured
 from app.agents.prompts import NUTRITION_SYSTEM
 from app.schemas import BioData, NutritionAdvice, SignalContext
 
@@ -34,11 +35,4 @@ def build_nutrition_prompt(energy: dict, data: BioData) -> str:
 
 async def nutrition_agent(ai, data: BioData, ctx: SignalContext) -> NutritionAdvice:
     energy = energy_tool(data, ctx)
-    response = await ai.generate(
-        system=NUTRITION_SYSTEM,
-        prompt=build_nutrition_prompt(energy, data),
-        output_schema=NutritionAdvice,
-    )
-    if response.output is None:
-        raise ValueError("Gemini no devolvio un consejo nutricional valido")
-    return response.output
+    return await generate_structured(ai, NUTRITION_SYSTEM, build_nutrition_prompt(energy, data), NutritionAdvice)

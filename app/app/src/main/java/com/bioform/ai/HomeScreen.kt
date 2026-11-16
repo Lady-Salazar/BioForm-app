@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -33,23 +34,27 @@ import androidx.health.connect.client.PermissionController
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
-/** Pantalla principal: permisos de Health Connect y datos del día. */
+/** Pantalla principal: datos de Health Connect y consejo del día. */
 @Composable
 fun HomeScreen(user: FirebaseUser, onSignOut: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val repo = remember { HealthRepository(context) }
+    val api = remember { BackendApi() }
     val scope = rememberCoroutineScope()
 
     val hcStatus = remember { repo.sdkStatus() }
     var hasPermissions by remember { mutableStateOf(false) }
     var summary by remember { mutableStateOf<DailySummary?>(null) }
     var loading by remember { mutableStateOf(false) }
+    var advice by remember { mutableStateOf<AdviceResult?>(null) }
+    var adviceLoading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
 
     fun loadData() {
         scope.launch {
             loading = true
             message = null
+            advice = null
             try {
                 summary = repo.readToday()
             } catch (e: Exception) {
@@ -59,7 +64,19 @@ fun HomeScreen(user: FirebaseUser, onSignOut: () -> Unit, modifier: Modifier = M
         }
     }
 
-    // Abre la ventana de permisos de Health Connect
+    fun requestAdvice(s: DailySummary) {
+        scope.launch {
+            adviceLoading = true
+            message = null
+            try {
+                advice = api.requestAdvice(user, s)
+            } catch (e: Exception) {
+                message = "No se pudo obtener el consejo: ${e.localizedMessage}"
+            }
+            adviceLoading = false
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         PermissionController.createRequestPermissionResultContract()
     ) { granted ->
@@ -68,7 +85,6 @@ fun HomeScreen(user: FirebaseUser, onSignOut: () -> Unit, modifier: Modifier = M
         else message = "Necesitamos todos los permisos para darte un consejo personalizado."
     }
 
-    // Al abrir la pantalla: revisa si ya hay permisos y carga los datos
     LaunchedEffect(Unit) {
         if (hcStatus == HealthConnectClient.SDK_AVAILABLE) {
             hasPermissions = repo.hasAllPermissions()
@@ -119,10 +135,25 @@ fun HomeScreen(user: FirebaseUser, onSignOut: () -> Unit, modifier: Modifier = M
                         MetricRow("Calorías", s.calories?.let { "$it kcal" })
                     }
                 }
+
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(onClick = { loadData() }, modifier = Modifier.fillMaxWidth()) {
                     Text("Actualizar datos")
                 }
+
+                Spacer(Modifier.height(16.dp))
+
+                if (adviceLoading) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(8.dp))
+                    Text("Generando tu consejo… puede tardar hasta 1 minuto.")
+                } else {
+                    Button(onClick = { requestAdvice(s) }, modifier = Modifier.fillMaxWidth()) {
+                        Text("Obtener mi consejo del día")
+                    }
+                }
+
+                advice?.let { AdviceSection(it) }
             }
         }
 
@@ -135,6 +166,63 @@ fun HomeScreen(user: FirebaseUser, onSignOut: () -> Unit, modifier: Modifier = M
 
         OutlinedButton(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
             Text("Cerrar sesión")
+        }
+    }
+}
+
+/** Muestra la alerta de salud (si hay) y el consejo de entrenamiento y nutrición. */
+@Composable
+private fun AdviceSection(a: AdviceResult) {
+    Spacer(Modifier.height(16.dp))
+
+    // Alerta o advertencia de frecuencia cardíaca (reglas fijas, sin IA)
+    if (a.level != "none") {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    if (a.level == "alert") "Alerta de frecuencia cardíaca" else "Aviso de frecuencia cardíaca",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(a.ruleMessage)
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+    }
+
+    when (a.adviceStatus) {
+        "blocked" -> Text("Por tu seguridad, hoy no generamos un consejo de entrenamiento.")
+        "unavailable" -> Text("El asesor de IA no está disponible ahora. Inténtalo más tarde.")
+        else -> {
+            a.training?.let { t ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Entrenamiento de hoy · intensidad ${t.intensity}", style = MaterialTheme.typography.titleMedium)
+                        Spacer(Modifier.height(8.dp))
+                        Text("Antes: ${t.pre}")
+                        Spacer(Modifier.height(4.dp))
+                        Text("Durante: ${t.during}")
+                        Spacer(Modifier.height(4.dp))
+                        Text("Después: ${t.post}")
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            a.nutrition?.let { n ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Alimentación de hoy", style = MaterialTheme.typography.titleMedium)
+                        Spacer(Modifier.height(8.dp))
+                        Text(n.summary)
+                        n.suggestions.forEach { Text("• $it") }
+                        Spacer(Modifier.height(4.dp))
+                        Text("Hidratación: ${n.hydration}")
+                    }
+                }
+            }
         }
     }
 }

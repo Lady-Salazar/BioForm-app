@@ -54,8 +54,8 @@ class SignalContext(BaseModel):
 class TrainingAdvice(BaseModel):
     """Salida estructurada del Agente Coach (la redacta Gemini)."""
 
-    intensity: Literal["descanso", "suave", "moderada", "alta"] = Field(
-        description="Intensidad recomendada para hoy"
+    intensity: str = Field(
+        description='Intensidad recomendada para hoy. Usa exactamente una de: "descanso", "suave", "moderada" o "alta"'
     )
     pre_workout: str = Field(description="Consejo antes de entrenar (1-2 frases)")
     during_workout: str = Field(description="Consejo durante el entrenamiento (1-2 frases)")

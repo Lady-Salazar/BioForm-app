@@ -1,4 +1,5 @@
 """Agente Coach: Gemini redacta el consejo de entrenamiento."""
+from app.agents.llm import generate_structured
 from app.agents.prompts import COACH_SYSTEM
 from app.schemas import BioData, RuleResult, SignalContext, TrainingAdvice
 
@@ -18,12 +19,19 @@ def build_coach_prompt(data: BioData, ctx: SignalContext, rule: RuleResult) -> s
     )
 
 
+VALID_INTENSITIES = {"descanso", "suave", "moderada", "alta"}
+
+
+def normalize_intensity(value: str, ctx: SignalContext) -> str:
+    """Asegura que la intensidad sea uno de los 4 valores permitidos."""
+    v = (value or "").strip().lower()
+    if v in VALID_INTENSITIES:
+        return v
+    # Valor inesperado: se elige uno seguro segun la recuperacion
+    return "suave" if ctx.recovery == "baja" else "moderada"
+
+
 async def coach_agent(ai, data: BioData, ctx: SignalContext, rule: RuleResult) -> TrainingAdvice:
-    response = await ai.generate(
-        system=COACH_SYSTEM,
-        prompt=build_coach_prompt(data, ctx, rule),
-        output_schema=TrainingAdvice,
-    )
-    if response.output is None:
-        raise ValueError("Gemini no devolvio un consejo de entrenamiento valido")
-    return response.output
+    advice = await generate_structured(ai, COACH_SYSTEM, build_coach_prompt(data, ctx, rule), TrainingAdvice)
+    advice.intensity = normalize_intensity(advice.intensity, ctx)
+    return advice

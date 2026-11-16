@@ -20,3 +20,34 @@ def get_ai():
             model=GoogleAI.gemini(GEMINI_MODEL),
         )
     return _ai
+
+
+import logging
+
+logger = logging.getLogger("bioform.llm")
+
+RETRY_PROMPT = (
+    "Tu respuesta anterior no cumplio el formato pedido. "
+    "Responde de nuevo SOLO con el objeto JSON que sigue el esquema, sin texto adicional."
+)
+
+
+async def generate_structured(ai, system: str, prompt: str, schema):
+    """Pide a Gemini una respuesta con formato fijo; si no cumple, reintenta una vez."""
+    response = await ai.generate(system=system, prompt=prompt, output_schema=schema)
+    if response.output is not None:
+        return response.output
+
+    logger.warning(
+        "Gemini no cumplio el esquema %s (finish_reason=%s). Texto: %s",
+        schema.__name__, response.finish_reason, (response.text or "")[:500],
+    )
+    retry = await ai.generate(messages=response.messages, prompt=RETRY_PROMPT, output_schema=schema)
+    if retry.output is not None:
+        return retry.output
+
+    logger.error(
+        "Reintento fallido para %s (finish_reason=%s). Texto: %s",
+        schema.__name__, retry.finish_reason, (retry.text or "")[:500],
+    )
+    raise ValueError(f"Gemini no devolvio una respuesta valida para {schema.__name__}")

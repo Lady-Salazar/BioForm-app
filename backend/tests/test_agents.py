@@ -54,3 +54,36 @@ def test_prompt_no_incluye_datos_personales():
     asyncio.run(run_advisor(bio(), make_fake_ai(calls)))
     joined = " ".join(calls)
     assert "dev-user" not in joined and "@" not in joined
+
+
+def test_reintenta_si_gemini_no_cumple_el_formato():
+    """Primera respuesta invalida (texto libre), segunda valida: el consejo se genera igual."""
+    import json
+    from genkit import Genkit, Message, ModelResponse, Part
+    from tests.fake_llm import COACH_JSON, NUTRITION_JSON
+
+    ai = Genkit(model="test/flaky")
+    calls = {"coach": 0}
+
+    async def flaky(request):
+        text = str(request)
+        if "Agente Nutricional" in text:
+            payload = json.dumps(NUTRITION_JSON)
+        else:
+            calls["coach"] += 1
+            payload = "Hoy entrena suave." if calls["coach"] == 1 else json.dumps(COACH_JSON)
+        return ModelResponse(message=Message(role="model", content=[Part(text=payload)]))
+
+    ai.define_model("test/flaky", flaky)
+    rule, ctx, status, advice = asyncio.run(run_advisor(bio(), ai))
+    assert status == "ok"
+    assert calls["coach"] == 2
+
+
+def test_intensidad_inesperada_se_normaliza():
+    from app.agents.coach_agent import normalize_intensity
+    ctx_baja = analyze_context(bio(sleep_hours=4))
+    ctx_normal = analyze_context(bio())
+    assert normalize_intensity("Alta", ctx_normal) == "alta"
+    assert normalize_intensity("ligera", ctx_baja) == "suave"
+    assert normalize_intensity("intensa", ctx_normal) == "moderada"
