@@ -31,7 +31,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 
-/** Pantalla de inicio de sesion y registro con correo y contrasena (Firebase Auth). */
+/** Pantalla de inicio de sesión y registro con correo y contraseña (Firebase Auth). */
 @Composable
 fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
     var email by remember { mutableStateOf("") }
@@ -42,8 +42,8 @@ fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
     // Revisa los datos antes de enviarlos a Firebase
     fun isValid(): Boolean {
         error = when {
-            !email.contains("@") -> "Escribe un correo electronico valido."
-            password.length < 6 -> "La contrasena debe tener al menos 6 caracteres."
+            !email.contains("@") -> "Escribe un correo electrónico válido."
+            password.length < 6 -> "La contraseña debe tener al menos 6 caracteres."
             else -> null
         }
         return error == null
@@ -64,7 +64,7 @@ fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it.trim() },
-            label = { Text("Correo electronico") },
+            label = { Text("Correo electrónico") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
@@ -75,7 +75,7 @@ fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contrasena") },
+            label = { Text("Contraseña") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -104,7 +104,7 @@ fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Iniciar sesion") }
+            ) { Text("Iniciar sesión") }
 
             Spacer(Modifier.height(8.dp))
 
@@ -125,12 +125,12 @@ fun LoginScreen(auth: FirebaseAuth, modifier: Modifier = Modifier) {
     }
 }
 
-/** Traduce los errores de Firebase a mensajes claros en espanol. */
+/** Traduce los errores de Firebase a mensajes claros en español. */
 fun authErrorMessage(e: Exception?): String = when (e) {
-    is FirebaseAuthWeakPasswordException -> "La contrasena es muy debil. Usa al menos 6 caracteres."
-    is FirebaseAuthUserCollisionException -> "Ya existe una cuenta con este correo. Inicia sesion."
+    is FirebaseAuthWeakPasswordException -> "La contraseña es muy débil. Usa al menos 6 caracteres."
+    is FirebaseAuthUserCollisionException -> "Ya existe una cuenta con este correo. Inicia sesión."
     is FirebaseAuthInvalidUserException -> "No existe una cuenta con este correo."
-    is FirebaseAuthInvalidCredentialsException -> "Correo o contrasena incorrectos."
-    is FirebaseNetworkException -> "Sin conexion a internet. Intentalo de nuevo."
-    else -> "No se pudo completar la operacion: ${e?.localizedMessage ?: "error desconocido"}"
+    is FirebaseAuthInvalidCredentialsException -> "Correo o contraseña incorrectos."
+    is FirebaseNetworkException -> "Sin conexión a internet. Inténtalo de nuevo."
+    else -> "No se pudo completar la operación: ${e?.localizedMessage ?: "error desconocido"}"
 }
