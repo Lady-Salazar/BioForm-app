@@ -45,6 +45,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")  // Base de datos
 
     implementation("androidx.health.connect:connect-client:1.1.0")  // Health Connect
+    implementation("androidx.core:core-splashscreen:1.0.1")          // Pantalla de carga
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

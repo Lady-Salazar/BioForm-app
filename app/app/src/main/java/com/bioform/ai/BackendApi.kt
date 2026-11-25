@@ -10,9 +10,9 @@ import java.net.URL
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-/** Direccion del backend. Al publicar en Render, solo se cambia esta linea. */
+/** Direccion del backend publicado en Render. */
 object BackendConfig {
-    const val BASE_URL = "http://127.0.0.1:8000"
+    const val BASE_URL = "https://bioform-api.onrender.com"
 }
 
 data class TrainingAdvice(val intensity: String, val pre: String, val during: String, val post: String)

@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Tema principal de la app -->
+    <style name="Theme.BioFormAI" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/bioform_background</item>
+    </style>
 
-    <style name="Theme.BioFormAI" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Pantalla de carga (splash): logo de BioForm AI sobre fondo claro -->
+    <style name="Theme.BioFormAI.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/bioform_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.BioFormAI</item>
+    </style>
 </resources>

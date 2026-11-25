@@ -17,3 +17,6 @@ Thumbs.db
 
 # Configuracion personal del editor
 .vscode/
+
+# Configuracion local de Android Studio
+app/.idea/
