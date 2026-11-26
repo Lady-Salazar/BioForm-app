@@ -83,6 +83,7 @@ fun HomeScreen(
     user: FirebaseUser,
     userType: String?,
     onSignOut: () -> Unit,
+    onOpenHar: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -164,7 +165,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
-        TopBar(email = user.email ?: "", onSignOut = onSignOut)
+        TopBar(email = user.email ?: "", onSignOut = onSignOut, onOpenHar = onOpenHar)
 
         Spacer(Modifier.height(16.dp))
 
@@ -242,7 +243,7 @@ fun HomeScreen(
 // ---------------------------------------------------------------- Barra superior
 
 @Composable
-private fun TopBar(email: String, onSignOut: () -> Unit) {
+private fun TopBar(email: String, onSignOut: () -> Unit, onOpenHar: () -> Unit) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Image(
@@ -277,6 +278,13 @@ private fun TopBar(email: String, onSignOut: () -> Unit) {
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                 DropdownMenuItem(text = { Text(email) }, onClick = { menuOpen = false }, enabled = false)
+                DropdownMenuItem(
+                    text = { Text("Recolectar datos (entrenamiento IA)") },
+                    onClick = {
+                        menuOpen = false
+                        onOpenHar()
+                    },
+                )
                 DropdownMenuItem(
                     text = { Text("Cerrar sesión") },
                     onClick = {

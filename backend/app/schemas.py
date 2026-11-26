@@ -91,3 +91,20 @@ class AdviceResponse(BaseModel):
         )
     )
     advice: AdviceContent | None = None
+
+
+class HarRequest(BaseModel):
+    """Senal inercial del telefono o del reloj: filas [ax, ay, az, gx, gy, gz] a 50 Hz."""
+
+    samples: list[list[float]] = Field(min_length=128, max_length=3000)
+    device: Literal["telefono", "reloj"] = "telefono"
+
+
+class HarResult(BaseModel):
+    """Actividad reconocida por el modelo de Random Forest."""
+
+    activity: str
+    category: str
+    confidence: float
+    windows: int
+    votes: dict[str, int]

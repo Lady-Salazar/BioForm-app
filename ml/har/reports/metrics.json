@@ -1,0 +1,235 @@
+{
+  "trained_at": "2026-11-26T01:41:02",
+  "validation": "independiente del sujeto (GroupKFold, 2 sujetos)",
+  "accuracy": 0.8031,
+  "f1_macro": 0.7658,
+  "evaluated_windows": 574,
+  "skipped_windows": 0,
+  "labels": [
+    "caminar",
+    "reposo",
+    "saltos",
+    "sentadillas",
+    "trotar"
+  ],
+  "confusion_matrix": [
+    [
+      67,
+      0,
+      15,
+      0,
+      0
+    ],
+    [
+      0,
+      161,
+      0,
+      3,
+      0
+    ],
+    [
+      1,
+      0,
+      111,
+      2,
+      9
+    ],
+    [
+      29,
+      1,
+      2,
+      87,
+      4
+    ],
+    [
+      0,
+      0,
+      47,
+      0,
+      35
+    ]
+  ],
+  "windows_per_activity": {
+    "reposo": 164,
+    "saltos": 123,
+    "sentadillas": 123,
+    "caminar": 82,
+    "trotar": 82
+  },
+  "recordings": [
+    {
+      "subject": "S01",
+      "activity": "caminar",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_caminar_bolsillo_20261125_200003_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S01",
+      "activity": "reposo",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_reposo_bolsillo_20261125_195752_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S01",
+      "activity": "saltos",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_saltos_bolsillo_20261125_200448_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S01",
+      "activity": "sentadillas",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_sentadillas_bolsillo_20261125_200316_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S01",
+      "activity": "trotar",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_trotar_bolsillo_20261125_200154_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S01",
+      "activity": "reposo",
+      "position": "bolsillo",
+      "device": "2311DRK48G",
+      "file": "S01_reposo_bolsillo_20261125_203126_2311DRK48G.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "caminar",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_caminar_bolsillo_20261125_203353_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "reposo",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_reposo_bolsillo_20261125_195748_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "reposo",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_reposo_bolsillo_20261125_203233_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "saltos",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_saltos_bolsillo_20261125_200136_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "saltos",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_saltos_bolsillo_20261125_203631_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "sentadillas",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_sentadillas_bolsillo_20261125_200313_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "sentadillas",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_sentadillas_bolsillo_20261125_203818_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    },
+    {
+      "subject": "S02",
+      "activity": "trotar",
+      "position": "bolsillo",
+      "device": "SM-A536E",
+      "file": "S02_trotar_bolsillo_20261125_203512_SM-A536E.csv",
+      "seconds": 60.0,
+      "windows": 41
+    }
+  ],
+  "rejected": [
+    {
+      "file": "S01_reposo_bolsillo_20261125_195038_2311DRK48G.csv",
+      "reason": "pantalla hacia afuera o telefono boca arriba (az=7.0)"
+    }
+  ],
+  "top_features": [
+    {
+      "feature": "gx_energy",
+      "importance": 0.06
+    },
+    {
+      "feature": "gy_std",
+      "importance": 0.0591
+    },
+    {
+      "feature": "gx_std",
+      "importance": 0.0526
+    },
+    {
+      "feature": "gy_energy",
+      "importance": 0.0516
+    },
+    {
+      "feature": "acc_mag_energy",
+      "importance": 0.05
+    },
+    {
+      "feature": "acc_mag_std",
+      "importance": 0.0498
+    },
+    {
+      "feature": "ay_std",
+      "importance": 0.0469
+    },
+    {
+      "feature": "acc_mag_mean",
+      "importance": 0.0465
+    },
+    {
+      "feature": "acc_mag_max",
+      "importance": 0.0414
+    },
+    {
+      "feature": "ay_energy",
+      "importance": 0.0351
+    }
+  ]
+}

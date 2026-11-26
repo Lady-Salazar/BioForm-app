@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -28,25 +29,48 @@ data class AdviceResult(
     val nutrition: NutritionAdvice?,
 )
 
-/** Envia el resumen del dia al backend (POST /advice) con el token de Firebase. */
+/** Actividad reconocida por el modelo de Random Forest. */
+data class HarResult(val activity: String, val category: String, val confidence: Double)
+
+/** Llamadas al backend con el token de Firebase. */
 class BackendApi {
 
+    /** POST /advice: resumen del dia -> reglas de salud + consejo de Gemini. */
     suspend fun requestAdvice(user: FirebaseUser, s: DailySummary): AdviceResult {
         val restingHr = s.restingHr
             ?: throw IllegalStateException("No hay frecuencia cardíaca en reposo para enviar.")
+        val body = JSONObject().apply {
+            put("day", s.day.toString())
+            put("resting_hr", restingHr)
+            put("at_rest", true)
+            s.steps?.let { put("steps", it) }
+            s.sleepHours?.let { put("sleep_hours", it) }
+            s.calories?.let { put("calories", it) }
+        }
+        return parseAdvice(post(user, "/advice", body))
+    }
+
+    /** POST /har/classify: senal del acelerometro y giroscopio -> actividad. */
+    suspend fun classifyActivity(user: FirebaseUser, rows: List<FloatArray>): HarResult {
+        val samples = JSONArray()
+        rows.forEach { r ->
+            // Cada fila guardada es [t_ms, ax, ay, az, gx, gy, gz]; se envian las 6 senales
+            samples.put(JSONArray().apply { for (i in 1..6) put(r[i].toDouble()) })
+        }
+        val body = JSONObject().put("device", "telefono").put("samples", samples)
+        val json = post(user, "/har/classify", body)
+        return HarResult(
+            activity = json.getString("activity"),
+            category = json.getString("category"),
+            confidence = json.getDouble("confidence"),
+        )
+    }
+
+    /** Envia un JSON por POST con el token de sesion y devuelve la respuesta. */
+    private suspend fun post(user: FirebaseUser, path: String, body: JSONObject): JSONObject {
         val token = getToken(user)
-
         return withContext(Dispatchers.IO) {
-            val body = JSONObject().apply {
-                put("day", s.day.toString())
-                put("resting_hr", restingHr)
-                put("at_rest", true)
-                s.steps?.let { put("steps", it) }
-                s.sleepHours?.let { put("sleep_hours", it) }
-                s.calories?.let { put("calories", it) }
-            }
-
-            val conn = (URL("${BackendConfig.BASE_URL}/advice").openConnection() as HttpURLConnection).apply {
+            val conn = (URL("${BackendConfig.BASE_URL}$path").openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
                 connectTimeout = 15_000
                 readTimeout = 90_000  // Render Free puede tardar ~50 s en despertar
@@ -54,14 +78,13 @@ class BackendApi {
                 setRequestProperty("Content-Type", "application/json")
                 setRequestProperty("Authorization", "Bearer $token")
             }
-
             try {
                 conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
                 val code = conn.responseCode
                 val stream = if (code in 200..299) conn.inputStream else conn.errorStream
                 val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
                 if (code !in 200..299) throw IllegalStateException("El servidor respondió $code: $text")
-                parse(JSONObject(text))
+                JSONObject(text)
             } finally {
                 conn.disconnect()
             }
@@ -77,7 +100,7 @@ class BackendApi {
         }
     }
 
-    private fun parse(json: JSONObject): AdviceResult {
+    private fun parseAdvice(json: JSONObject): AdviceResult {
         val rule = json.getJSONObject("rule")
         val advice = json.optJSONObject("advice")
         val training = advice?.getJSONObject("training")?.let {

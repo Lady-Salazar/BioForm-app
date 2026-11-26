@@ -20,3 +20,9 @@ Thumbs.db
 
 # Configuracion local de Android Studio
 app/.idea/
+
+# Datos crudos de entrenamiento HAR
+ml/har/data/
+
+# Datos crudos de entrenamiento HAR
+ml/har/data/

@@ -75,6 +75,7 @@ private fun LoggedInFlow(user: FirebaseUser, onSignOut: () -> Unit, modifier: Mo
     var profile by remember(user.uid) { mutableStateOf<UserProfile?>(null) }
     var saving by remember { mutableStateOf(false) }
     var saveError by remember { mutableStateOf<String?>(null) }
+    var showHar by remember { mutableStateOf(false) }
 
     LaunchedEffect(user.uid) {
         profile = try {
@@ -109,10 +110,17 @@ private fun LoggedInFlow(user: FirebaseUser, onSignOut: () -> Unit, modifier: Mo
             modifier = modifier,
         )
 
+        showHar -> HarCollectScreen(
+            user = user,
+            onBack = { showHar = false },
+            modifier = modifier,
+        )
+
         else -> HomeScreen(
             user = user,
             userType = p.userType,
             onSignOut = onSignOut,
+            onOpenHar = { showHar = true },
             modifier = modifier,
         )
     }
